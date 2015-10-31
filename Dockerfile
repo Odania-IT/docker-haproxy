@@ -32,5 +32,7 @@ RUN buildDeps='curl gcc libc6-dev libpcre3-dev libssl-dev make' \
 COPY supervisor/haproxy.conf /etc/supervisor/conf.d/haproxy.conf
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
 
+EXPOSE 80 1936
+
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
