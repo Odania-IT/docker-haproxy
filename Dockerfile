@@ -8,9 +8,9 @@ ENV HAPROXY_VERSION 1.6.1
 ENV HAPROXY_MD5 7343def2af8556ebc8972a9748176094
 
 # see http://sources.debian.net/src/haproxy/1.5.8-1/debian/rules/ for some helpful navigation of the possible "make" arguments
+RUN set -x && apt-get update && apt-get install -y curl gcc libc6-dev libpcre3-dev libssl-dev make
 RUN buildDeps='curl gcc libc6-dev libpcre3-dev libssl-dev make' \
 	&& set -x \
-	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 	&& curl -SL "http://www.haproxy.org/download/${HAPROXY_MAJOR}/src/haproxy-${HAPROXY_VERSION}.tar.gz" -o haproxy.tar.gz \
 	&& echo "${HAPROXY_MD5}  haproxy.tar.gz" | md5sum -c \
 	&& mkdir -p /usr/src/haproxy \
@@ -25,12 +25,15 @@ RUN buildDeps='curl gcc libc6-dev libpcre3-dev libssl-dev make' \
 		install-bin \
 	&& mkdir -p /usr/local/etc/haproxy \
 	&& cp -R /usr/src/haproxy/examples/errorfiles /usr/local/etc/haproxy/errors \
-	&& rm -rf /usr/src/haproxy \
-	&& apt-get purge -y --auto-remove $buildDeps
+	&& rm -rf /usr/src/haproxy
 
 # Setup haproxy with supervisord
 COPY supervisor/haproxy.conf /etc/supervisor/conf.d/haproxy.conf
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+RUN ln -s /usr/local/etc/haproxy/ /etc/haproxy
+
+RUN groupadd haproxy
+RUN useradd -g haproxy -r haproxy
 
 EXPOSE 80 1936
 
