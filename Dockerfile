@@ -28,8 +28,8 @@ RUN buildDeps='curl gcc libc6-dev libpcre3-dev libssl-dev make' \
 	&& rm -rf /usr/src/haproxy
 
 # Setup haproxy with supervisord
-COPY supervisor/haproxy.conf /etc/supervisor/conf.d/haproxy.conf
-COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+RUN mkdir -p /etc/service/haproxy
+COPY runit/haproxy.sh /etc/service/haproxy/run
 RUN ln -s /usr/local/etc/haproxy/ /etc/haproxy
 
 RUN groupadd haproxy
